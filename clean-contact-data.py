@@ -17,15 +17,20 @@ def digit_only(string):
 
 def check_invalid(string,*invalids,defaults=True):
     """Checks if input string matches an invalid value"""
+
+    # Checks inputted invalid values
     for v in invalids:
         if string == v:
             return True
 
+    # Checks default invalid values
     if  defaults == True:
         default_invalids = ['INC','inc','incomplete','NaN','nan','N/A','n/a','missing']
         for v in default_invalids:
             if string == v:
                 return True
+
+    # If the string is valid
     return False
 
 
@@ -58,13 +63,17 @@ def clean_lastname(name, *additional_invalids, check_defaults=False):
     if check_invalid(name,*additional_invalids, defaults=check_defaults) == True:
         return ''
 
-    # Removes non-alpha characters
-    clean_name = alpha_only(name)
-
     # Converts all characters to upper case
     clean_name = clean_name.upper()
 
-    return clean_name
+    # Checks for suffixes and titles
+    
+
+    # Removes non-alpha characters
+    clean_name = alpha_only(name)
+
+
+    return clean_name, suffix
 
 
 
