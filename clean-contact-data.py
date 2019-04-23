@@ -18,19 +18,19 @@ def digit_only(string):
 def check_invalid(string,*invalids,defaults=True):
     """Checks if input string matches an invalid value"""
 
-    # Checks inputted invalid values
+    # Checks string against inputted invalid values
     for v in invalids:
         if string == v:
             return True
 
-    # Checks default invalid values
+    # Checks string against default invalid values, if defaults=True
     if  defaults == True:
         default_invalids = ['INC','inc','incomplete','NaN','nan','N/A','n/a','missing']
         for v in default_invalids:
             if string == v:
                 return True
 
-    # If the string is valid
+    # For valid strings 
     return False
 
 
@@ -56,7 +56,7 @@ def clean_phone(phone_number, drop_invalid=False, area_code='406'):
     return clean_number
 
 
-def clean_lastname(name, *additional_invalids, check_defaults=False):
+def clean_lastname(name, *additional_invalids, check_defaults=False, check_titlesuffix=False):
     """Removes invalid values and non-alphabetical characters, standardizes case"""
 
     # Returns empty string if name matches an additional invalid value
@@ -64,16 +64,32 @@ def clean_lastname(name, *additional_invalids, check_defaults=False):
         return ''
 
     # Converts all characters to upper case
-    clean_name = clean_name.upper()
+    clean_name = name.upper()
 
-    # Checks for suffixes and titles
-    
+    # Checks for suffixes and titles if option is set to True
+    if check_titlesuffix == True:
+        
+        # checks for suffixes in suffix_list, strips from clean_name and saves as suffix
+        suffix_list = ['JR','J.R.','SR','S.R.','III','IV']
+        suffix = ''
+        for s in suffix_list:
+            if clean_name[(-len(s)-1):] == ' ' + s:
+                suffix = clean_name[-len(s):]
+                clean_name = clean_name[:(-len(s)-1)]
+
+        # Checks for titles in title_list and strips from clean_name
+        title_list = ['MD','M.D.','DO','D.O.','DVM','D.V.M.','JD','J.D.','PHD','PH.D.']
+        for t in title_list:
+            if clean_name[(-len(t)-1):] == ' ' + t:
+                clean_name = clean_name[:(-len(t)-1)]
 
     # Removes non-alpha characters
-    clean_name = alpha_only(name)
+    clean_name = alpha_only(clean_name)
 
+    # Returns name and suffix if check_titlesuffix=True
+    if check_titlesuffix == True:
+        return clean_name, suffix
 
-    return clean_name, suffix
-
-
-
+    # Otherwise just returns name
+    else:
+        return clean_name
