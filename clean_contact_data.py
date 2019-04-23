@@ -4,6 +4,9 @@
 # author: Michelle Vered
 # date updated: 4/23/19
 
+# import dependencies
+import pandas as pd
+
 # smaller functions
 def alpha_only(string):
     """Removes non-alpha characters"""
@@ -61,7 +64,10 @@ def clean_lastname(name, *additional_invalids, check_defaults=False, check_title
 
     # Returns empty string if name matches an invalid value
     if check_invalid(name,*additional_invalids, defaults=check_defaults) == True:
-        return ''
+        if check_titlesuffix == False:
+            return ''
+        else:
+            return pd.Series({'last_name':'', 'suffix':''})
 
     # Converts all characters to upper case
     clean_name = name.upper()
@@ -88,7 +94,7 @@ def clean_lastname(name, *additional_invalids, check_defaults=False, check_title
 
     # Returns name and suffix if check_titlesuffix=True
     if check_titlesuffix == True:
-        return clean_name, suffix
+        return pd.Series({'last_name':clean_name, 'suffix':suffix})
 
     # Otherwise just returns name
     else:
@@ -99,10 +105,10 @@ def clean_firstname(name, *additional_invalids, check_defaults=False, check_titl
 
     # Returns empty strings if name matches an invalid value
     if check_invalid(name,*additional_invalids, defaults=check_defaults) == True:
-        return '','',''
+        return pd.Series({'first_name':'', 'middle_name':'','extra_names':''})
 
     # Converts all characters to upper case
-    name = name.upper()
+    name = str(name).upper()
 
     # Removes additional household members who may have been included in the same field
     name = name.replace(' and ', ' , ')  #replace 'and' delimiter with comma 
@@ -137,4 +143,4 @@ def clean_firstname(name, *additional_invalids, check_defaults=False, check_titl
     main_name = alpha_only(main_name)
     middle_name = alpha_only(middle_name)
 
-    return main_name, middle_name, extra_names
+    return pd.Series({'first_name':main_name, 'middle_name':middle_name,'extra_names':extra_names})
