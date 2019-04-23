@@ -59,7 +59,7 @@ def clean_phone(phone_number, drop_invalid=False, area_code='406'):
 def clean_lastname(name, *additional_invalids, check_defaults=False, check_titlesuffix=False):
     """Removes invalid values and non-alphabetical characters, standardizes case"""
 
-    # Returns empty string if name matches an additional invalid value
+    # Returns empty string if name matches an invalid value
     if check_invalid(name,*additional_invalids, defaults=check_defaults) == True:
         return ''
 
@@ -93,3 +93,48 @@ def clean_lastname(name, *additional_invalids, check_defaults=False, check_title
     # Otherwise just returns name
     else:
         return clean_name
+
+def clean_firstname(name, *additional_invalids, check_defaults=False, check_title=False):
+    """Separates out middle names, titles, extra names. Removes invalid values."""
+
+    # Returns empty strings if name matches an invalid value
+    if check_invalid(name,*additional_invalids, defaults=check_defaults) == True:
+        return '','',''
+
+    # Converts all characters to upper case
+    name = name.upper()
+
+    # Removes additional household members who may have been included in the same field
+    name = name.replace(' and ', ' , ')  #replace 'and' delimiter with comma 
+    name = name.replace(' & ',' , ')     #replace '&' delimiter with comma
+    split_name = name.split(',',1)       #splits text field in two at comma
+    main_name = split_name[0]            #saves the first name in list as main_name
+    
+    # Saves additional names to extra_names if any exist, otherwise it will be an empty string
+    if len(split_name) > 1:
+        extra_names = split_name[1]
+    else:
+        extra_names = ''
+
+    # Checks for titles if option is set to True and removes them from main_name field
+    if check_title == True:
+        title_list = ['DR.','DR','REV.','REVEREND','HON.','HON','THE HONORABLE','THE REVEREND DR.']
+        for t in title_list:
+            if main_name[:(len(t)+1)] == t + ' ':
+                main_name = main_name[(len(t)+1):]
+
+    # Removes middle names from main_name
+    split_main_name = main_name.split(' ',1)
+    main_name = split_main_name[0]
+
+    # Saves middle names to middle_name if any exist, otherwise it will be an empty string
+    if len(split_main_name) > 1:
+        middle_name = split_main_name[1]
+    else:
+        middle_name = ''
+
+    # Removes non-alpha characters from main and middle names
+    main_name = alpha_only(main_name)
+    middle_name = alpha_only(middle_name)
+
+    return main_name, middle_name, extra_names
